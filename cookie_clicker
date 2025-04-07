@@ -3,13 +3,17 @@ import React, { useState } from 'react';
  import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
  
  export default function App() {
-   // Criamos um estado para armazenar a quantidade de cookies
-   const [cookies, setCookies] = useState(0);
- 
-   // Função que será chamada quando o botão for pressionado
+  const [cookies, setCookies] = useState(0);
+ const [click, setClickPower]=useState(1);
    const handleClick = () => {
-     setCookies(cookies + 1); // Incrementa a contagem de cookies
+     setCookies(cookies + clikPower);
    };
+constBuyUpgrade=()=>{
+if (cookies>=10){
+setCookies (cookies-10);
+setClickPower (cookiesclickPower+1);
+}
+};
  
    return (
      <View style={styles.container}>
@@ -20,11 +24,15 @@ import React, { useState } from 'react';
        <TouchableOpacity style={styles.button} onPress={handleClick}>
          <Text style={styles.buttonText}>Clique para ganhar cookies!</Text>
        </TouchableOpacity>
+<touchableOpacity style= {styles.upgradeButton}onpress={buyUgrade}>
+<text style= {styles.buttontext}>upgrade (+1 por clique)custa 10 cookies </text>
+<touchableOpacity>
+
      </View>
    );
  }
  
- // Estilos para os componentes da interface
+
  const styles = StyleSheet.create({
    container: {
      flex: 1,
@@ -43,7 +51,14 @@ import React, { useState } from 'react';
    },
    buttonText: {
      fontSize: 18,
+
      color: '#fff',
      fontWeight: 'bold',
    },
- });
+
+upgradeButton:{
+backgroundColor: '#4caf50',
+padding:15,
+borderRadius:10,
+},
+});
