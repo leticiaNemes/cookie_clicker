@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+ };import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -17,7 +17,8 @@ export default function App() {
       if (savedCookies !== null) setCookies(parseInt(savedCookies));
       if (savedClickPower !== null) setClickPower(parseInt(savedClickPower));
       if (savedAutoClickers !== null) setAutoClickers(parseInt(savedAutoClickers));
-    };
+   
+
     loadData();
   }, []);
 
