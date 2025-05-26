@@ -131,9 +131,11 @@ pulseAnimation(); //iniciar a animação de clique
       <Text style={styles.text}>Meta Diária: {dailyGoal} cookies</Text>
       <Text style={styles.text}>Progresso Diário: {dailyProgress}</Text>
 
-      <TouchableOpacity style={styles.button} onPress={handleClick}>
-        <Text style={styles.buttonText}>Clique para ganhar cookies!</Text>
-      </TouchableOpacity>
+    <animated.view style={{ transform: [{ scale}] }}>
+<touchableOpaciyy onpress={handleClick}>
+<image soucer={require('./assets/cookie.png')} style={{ width: 100, hight:100}} />
+</touchableOpacity>
+</animated.view>
 
       <TouchableOpacity style={styles.upgradeButton} onPress={buyUpgrade}>
         <Text style={styles.buttonText}>Upgrade (+1 por clique) - 10 cookies</Text>
