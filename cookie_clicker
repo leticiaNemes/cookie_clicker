@@ -1,5 +1,8 @@
+// Aula 11 - Sistema de Missões, Conquistas e Metas Diárias
+
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, animated, image } from 'react-native';
+import {audio} from 'expo-av'; //importa o moduloi de audio do expo 
 
 export default function App() {
   const [cookies, setCookies] = useState(0);
@@ -7,13 +10,17 @@ export default function App() {
   const [autoClickers, setAutoClickers] = useState(0);
   const [achievements, setAchievements] = useState([]);
 
-/variaveis para conquista diaria
-const [dailyGoal,setDailyGoal] = usestate(100); //meta diaria é 100 cookies
-cost [dailyProgress, setDailyProgress] = usestate(0); //progresso diario inicial é 0
-cost [lastLogin, setLastLogin] = usestate(new date().toDatestring()); 
+  // Metas diárias
+  const [dailyGoal, setDailyGoal] = useState(100);
+  const [dailyProgress, setDailyProgress] = useState(0);
+//verifica a data do login
+  const [lastLogin, setLastLogin] = useState(new Date().toDateString());
+//estado para som
+const[sound,setSound] = useState();
+//estado para animação de clique 
+const scale = useRef (new  animated (1)).current;
 
 
-  // Lista de conquistas baseadas em metas de cookies
   const achievementsList = [
     { id: 1, name: 'Primeiros 10 Cookies!', goal: 10 },
     { id: 2, name: 'Chegou a 100 Cookies!', goal: 100 },
@@ -21,9 +28,35 @@ cost [lastLogin, setLastLogin] = usestate(new date().toDatestring());
     { id: 4, name: '5 Auto-Clickers!', goal: 5, type: 'autoClicker' },
     { id: 5, name: 'Clique Poderoso 10+', goal: 10, type: 'clickPower' },
   ];
+//função para tocar som 
+async funcion playSound() {
+const {sound} = await audio.Sound. createAsync(
+require('./assets/click-sound.mp3')//certifique-se de ter um arquivo de som na pasta assets
+};
+//define o som no estado 
+useEffect (() => {
+setSound (sound);
+return sound ? () =>  
+sound.unloadAsync(): underfined;
+}, [sound]);
+
+const pulseAnimation=() => {
+animated.sequence([
+//aumentar o tamanho 
+animated.timing(scale, {
+toValue:1.2,
+duration:100,
+useNativeDriver: true,
+}),
+]).start();
+};
+
 
   const handleClick = () => {
     setCookies(cookies + clickPower);
+    setDailyProgress(prev => prev + clickPower);
+playSound(); //tocar o som ao clicar 
+pulseAnimation(); //iniciar a animação de clique 
   };
 
   const buyUpgrade = () => {
@@ -65,32 +98,38 @@ cost [lastLogin, setLastLogin] = usestate(new date().toDatestring());
     });
   }, [cookies, autoClickers, clickPower]);
 
-//checa diariamente se é um novo dia
-useEfect() => {
-const today interval= setInterval(() => {
-const today = new Date ().toDateString();
-if (today!== lastLogin) {
-setLastLogin(today);
-setDailyProgress(0); //reseta o progresso diario
-setDailyGoal(math.floor(Math.random()* 100)+ 50); //gera uma nova meta diaria
-};
-if (dailydailyProgress >= dailyGoal) {
-Alert.alert('parabens!', 'você completou a meta diaria');
-setDailyProgress(0); //reseta o progresso diario 
-};
-});
+  // Checa diariamente se é um novo dia e reinicia a meta
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const today = new Date().toDateString();
+      if (lastLogin !== today) {
+        resetDailyGoal();
+      }
+    }, 60000);
 
+    return () => clearInterval(interval);
+  }, [lastLogin]);
 
+  const resetDailyGoal = () => {
+    setDailyGoal(100);
+    setDailyProgress(0);
+    setLastLogin(new Date().toDateString());
+  };
 
+  // Alerta ao atingir a meta diária
+  useEffect(() => {
+    if (dailyProgress >= dailyGoal) {
+      Alert.alert("Meta Diária Concluída!", "Você ganhou 100 cookies hoje!");
+    }
+  }, [dailyProgress]);
 
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Cookies: {cookies}</Text>
       <Text style={styles.text}>Poder de Clique: {clickPower}</Text>
       <Text style={styles.text}>Auto-Clickers: {autoClickers}</Text>
-      <Text style={styles.text}>meta diaria: {dailyGoal} cookies</Text>
-      <Text style={styles.text}>progresso diario: {dailyProgresso} cookies</Text>
-
+      <Text style={styles.text}>Meta Diária: {dailyGoal} cookies</Text>
+      <Text style={styles.text}>Progresso Diário: {dailyProgress}</Text>
 
       <TouchableOpacity style={styles.button} onPress={handleClick}>
         <Text style={styles.buttonText}>Clique para ganhar cookies!</Text>
