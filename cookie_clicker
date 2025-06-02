@@ -1,26 +1,18 @@
-// Aula 11 - Sistema de Missões, Conquistas e Metas Diárias
-
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, animated, image } from 'react-native';
-import {audio} from 'expo-av'; //importa o moduloi de audio do expo 
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, Animated, Image } from 'react-native';
+import { Audio } from 'expo-av';
 
 export default function App() {
   const [cookies, setCookies] = useState(0);
   const [clickPower, setClickPower] = useState(1);
   const [autoClickers, setAutoClickers] = useState(0);
   const [achievements, setAchievements] = useState([]);
-
+  const [sound, setSound] = useState();
+  const scale = useRef(new Animated.Value(1)).current;
   // Metas diárias
   const [dailyGoal, setDailyGoal] = useState(100);
   const [dailyProgress, setDailyProgress] = useState(0);
-//verifica a data do login
   const [lastLogin, setLastLogin] = useState(new Date().toDateString());
-//estado para som
-const[sound,setSound] = useState();
-//estado para animação de clique 
-const scale = useRef (new  animated (1)).current;
-
-
   const achievementsList = [
     { id: 1, name: 'Primeiros 10 Cookies!', goal: 10 },
     { id: 2, name: 'Chegou a 100 Cookies!', goal: 100 },
@@ -28,35 +20,40 @@ const scale = useRef (new  animated (1)).current;
     { id: 4, name: '5 Auto-Clickers!', goal: 5, type: 'autoClicker' },
     { id: 5, name: 'Clique Poderoso 10+', goal: 10, type: 'clickPower' },
   ];
-//função para tocar som 
-async funcion playSound() {
-const {sound} = await audio.Sound. createAsync(
-require('./assets/click-sound.mp3')//certifique-se de ter um arquivo de som na pasta assets
-};
-//define o som no estado 
-useEffect (() => {
-setSound (sound);
-return sound ? () =>  
-sound.unloadAsync(): underfined;
-}, [sound]);
+  async function playSound() {
+    const { sound } = await Audio.Sound.createAsync(
+      require('./assets/click.mp3')
+    );
+    setSound(sound);
+    await sound.playAsync();
+  }
 
-const pulseAnimation=() => {
-animated.sequence([
-//aumentar o tamanho 
-animated.timing(scale, {
-toValue:1.2,
-duration:100,
-useNativeDriver: true,
-}),
-]).start();
-};
+  useEffect(() => {
+    return sound ? () => sound.unloadAsync() : undefined;
+  }, [sound]);
 
+  const pulseAnimation = () => {
+    Animated.sequence([
+      Animated.timing(scale, {
+        toValue: 1.2,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      })
+    ]).start();
+  };
 
   const handleClick = () => {
     setCookies(cookies + clickPower);
+    pulseAnimation();
+    playSound();
+  const handleClick = () => {
+    setCookies(cookies + clickPower);
     setDailyProgress(prev => prev + clickPower);
-playSound(); //tocar o som ao clicar 
-pulseAnimation(); //iniciar a animação de clique 
   };
 
   const buyUpgrade = () => {
@@ -73,7 +70,6 @@ pulseAnimation(); //iniciar a animação de clique
     }
   };
 
-  // Gera cookies automaticamente
   useEffect(() => {
     const interval = setInterval(() => {
       setCookies(prev => prev + autoClickers);
@@ -81,8 +77,6 @@ pulseAnimation(); //iniciar a animação de clique
 
     return () => clearInterval(interval);
   }, [autoClickers]);
-
-  // Checagem de conquistas
   useEffect(() => {
     achievementsList.forEach(achievement => {
       if (!achievements.includes(achievement.id)) {
@@ -131,11 +125,11 @@ pulseAnimation(); //iniciar a animação de clique
       <Text style={styles.text}>Meta Diária: {dailyGoal} cookies</Text>
       <Text style={styles.text}>Progresso Diário: {dailyProgress}</Text>
 
-    <animated.view style={{ transform: [{ scale}] }}>
-<touchableOpaciyy onpress={handleClick}>
-<image soucer={require('./assets/cookie.png')} style={{ width: 100, hight:100}} />
-</touchableOpacity>
-</animated.view>
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <TouchableOpacity onPress={handleClick}>
+          <Image source={require('./assets/cookie.png')} style={styles.cookieImage} />
+        </TouchableOpacity>
+      </Animated.View>
 
       <TouchableOpacity style={styles.upgradeButton} onPress={buyUpgrade}>
         <Text style={styles.buttonText}>Upgrade (+1 por clique) - 10 cookies</Text>
@@ -167,11 +161,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 10,
   },
-  button: {
-    backgroundColor: '#ff9800',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
+  cookieImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 20,
   },
   upgradeButton: {
     backgroundColor: '#4caf50',
